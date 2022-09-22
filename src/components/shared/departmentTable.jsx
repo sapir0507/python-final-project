@@ -118,7 +118,7 @@ Row.propTypes = {
   row: PropTypes.shape({
     departmentName: PropTypes.string.isRequired,
     manger: PropTypes.string.isRequired,
-    employees: PropTypes.array.isRequired
+    employees: PropTypes.arrayOf(PropTypes.string).isRequired
   }).isRequired,
 };
 
