@@ -7,22 +7,27 @@ import auth from '../services/auth';
 // import users_ws from '../services/users_service';
 import { useDispatch } from 'react-redux';
 import { 
-    setToken, 
-    // getToken 
+    setToken, setUser, 
 } from '../redux/slices/sessionSlice'
+import users_ws from '../services/users_service';
+import TextFieldComp from './shared/textfield';
+import { grid } from '@mui/system';
 
 
 
 const FormControlComp = ({values, handleChange, type, handleClickShowPassword, handleMouseDownPassword}) => {
     return (
-        
-        <FormControl               
+        <FormControl 
             variant="outlined"
-            sx={{m:1, width: '25ch'}}
+            color='primary'
+            sx={{
+                margin: 2, 
+                width: '25ch',
+                placeContent: 'center'
+            }}
         >
         <InputLabel sx={{textTransform: 'capitalize'}}>{type}</InputLabel>
         <OutlinedInput
-            
             type={type==='username'? 'text': values.showPassword? 'text': 'password'}
             value={type === 'username'? values.username : values.password}
             onChange={handleChange(type)}
@@ -86,11 +91,16 @@ export const LoginComp = (props) => {
     const hanleLoginAttempt = async (event) => {
         //attempt login
         const auth_success = await authLogin(values.username,  values.password)
-       
         auth_success? handleError(true) : handleError(false)
         if(auth_success){
            dispatch(setToken(sessionStorage["token"]))
-           
+           dispatch(setUser({
+            username: values.username,
+            email: values.password,
+            FirstName: "",
+            LastName: "",
+            id: ""
+           }))
            navigate('/')
         }
         
@@ -105,22 +115,51 @@ export const LoginComp = (props) => {
                 textShadow: 'unset',
                 fontWeight: 700
             }}>LOGIN</Typography>
-            <Box component={"div"} sx={{ m: 3, flexGrow: 1, justifyContent: 'center'}}>
-            <Grid container>
-                <Grid item>
-                  <FormControlComp values={values} type="username" handleChange={handleChange}></FormControlComp> 
+            <Box component={"div"} sx={{ 
+               margin: "0 auto",
+               padding: 2,
+               border: "2px solid black",
+               borderRadius: "10px",
+               maxWidth: "70vh",
+               zIndex: 2,
+               boxShadow: '2px 2px 2px darkblue'
+            }}>
+            <Grid container>  
+                <Grid item xs={12}>
+                    <Box sx={{display: 'grid', placeContent:'center'}}>
+                        <FormControlComp 
+                            values={values} 
+                            type="username" 
+                            handleChange={handleChange}>
+                        </FormControlComp> 
+                    </Box>
                 </Grid>
-                <Grid item >
-                <FormControlComp values={values} type="password" handleClickShowPassword={handleClickShowPassword} handleMouseDownPassword={handleMouseDownPassword} handleChange={handleChange}></FormControlComp>
+                <Grid item xs={12}>
+                   <Box sx={{display: 'grid', placeContent:'center'}}>
+                        <FormControlComp 
+                            values={values} 
+                            type="password" 
+                            handleClickShowPassword={handleClickShowPassword} 
+                            handleMouseDownPassword={handleMouseDownPassword} 
+                            handleChange={handleChange}>
+                        </FormControlComp>
+                    </Box>
                 </Grid>
-                <Grid item>
-                    <FormControl
-                        sx={{m:1, flexGrow: 1, width: '20ch', justifyContent:'center'}}
-                    >
-                        <Button variant='outlined' color='success' onClick={hanleLoginAttempt} sx={{height: '7ch', justifyContent: 'center'}}>Login</Button>                        
-                    </FormControl>
-                </Grid>
+                <Grid item xs={12}>
+                    <Box sx={{display: 'grid', placeContent:'center'}}>
+                        <Button 
+                            variant='contained' 
+                            color='success' 
+                            onClick={hanleLoginAttempt} 
+                            sx={{
+                                height: '7ch', 
+                                justifyContent: 'center'
+                            }}>
+                                Login
+                        </Button>                        
 
+                    </Box>
+                </Grid>
             </Grid>
         </Box>
         </Container>

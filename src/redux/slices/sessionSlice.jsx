@@ -3,7 +3,13 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   session: {
     token: "",
-    user: {}
+    user: {
+      username: "",
+      email: "",
+      FirstName: "",
+      LastName: "",
+      id: ""
+    }
   },
 };
 
@@ -21,10 +27,8 @@ export const sessionSlice = createSlice({
       const a = {...state, session: {
         ...session,
         token: action.payload
-      }} 
+      }}   
       
-      
-    //   sessionStorage["token"] = a["session"]
       return a
     },
     setUser: (state, action)=>{

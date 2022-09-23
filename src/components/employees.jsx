@@ -55,7 +55,7 @@ export const EmployeesComp = (props) => {
 
     return(
         <div>  
-             <Typography align='center' variant='h2' component={'h1'} color={'black'} sx={{
+            <Typography align='center' variant='h2' component={'h1'} color={'black'} sx={{
                 flexGrow: 1,
                 m:4,
                 textShadow: 'unset',
@@ -63,12 +63,7 @@ export const EmployeesComp = (props) => {
                 }}>EMPLOYEES</Typography>
             <Container sx={{marginTop: 4}}>
             <Grid container spacing={2}>
-                <Grid item xs={12}>  
-                    <Button variant="contained" color='info' size='large' onClick={()=>{navigate("/new-employee")}}>
-                        New Employee
-                    </Button>       
-                </Grid>
-                <Grid item md={2}>
+                <Grid item md={2} xs={7}>
                     <Box sx={{ minWidth: 120 }}>
                         <FormControl  variant="standard" fullWidth>
                             <InputLabel id="department-select-label">Department</InputLabel>
@@ -87,7 +82,14 @@ export const EmployeesComp = (props) => {
                         </FormControl>
                     </Box>
                 </Grid>
-                <Grid item xs={10}>
+                <Grid item xs={3}>  
+                    <Box sx={{m:3}}>
+                    <Button variant="contained" color='info' size='large' onClick={()=>{navigate("/new-employee")}}>
+                        New Employee
+                    </Button>    
+                    </Box>   
+                </Grid>
+                <Grid item xs={12}>
                     <Box sx={{marginTop: 3}}>
                         <CollapsibleTable>
                         </CollapsibleTable>

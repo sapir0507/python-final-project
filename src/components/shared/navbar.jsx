@@ -29,7 +29,7 @@ const darkTheme = createTheme({
 });
 
 const pages = [ 'employees','departments', 'shifts', 'users', 'login'];
-const settings = ['profile', 'account', 'dashboard', 'logout'];
+const settings = ['dashboard', 'employees','departments', 'shifts', 'users', 'logout'];
 
 const NavbarComp = () => {
   const navigate = useNavigate()
@@ -43,8 +43,9 @@ const NavbarComp = () => {
     console.log(session.session["token"]);
     if(session.session["token"]!=="")
       setLoggedin(true)
-    else 
+    else {
       setLoggedin(false)
+    }
   }, [session])
   
 
@@ -138,8 +139,6 @@ const NavbarComp = () => {
           <Typography
             variant="h5"
             noWrap
-            component="a"
-            href=""
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -149,6 +148,10 @@ const NavbarComp = () => {
               letterSpacing: '.3rem',
               color: 'inherit',
               textDecoration: 'none',
+            }}
+            onClick={(e)=>{
+              e.preventDefault()
+              navigate('/dashboard')
             }}
           >
             LOGO
@@ -170,7 +173,12 @@ const NavbarComp = () => {
               else return <span key={page}></span>
             })}
           </Box>
-          {loggedin? <Box sx={{ flexGrow: 0 }}>
+          {loggedin? <Box sx={{ flexGrow: 0 }}> 
+                        username
+                      </Box>: 
+                      <Box></Box>
+          }
+          {loggedin? <Box sx={{ flexGrow: 0, m:2 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
@@ -198,14 +206,17 @@ const NavbarComp = () => {
                     sessionStorage["token"] = ""
                     dispatch(setToken(""))
                     setLoggedin(false)
-                    navigate("/")
+                    navigate("/login")
+                  }
+                  else{
+                    navigate(`/${setting}`)
                   }
                 }}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>
-          </Box>: <Box></Box>}
+          </Box>: <Box sx={{ flexGrow: 0, m:2 }}></Box>}
           
         </Toolbar>
       </Container>
