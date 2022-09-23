@@ -101,8 +101,8 @@ function Row(props) {
                     </StyledTableRow>
                   </TableHead>
                   <TableBody>
-                    {row.shifts.map((shift) => (
-                      <StyledTableRow key={shift.date} colSpan={3}>
+                    {row.shifts.map((shift, index) => (
+                      <StyledTableRow key={index} colSpan={3}>
                         <StyledTableCell component="th" scope="row" colSpan={1}>
                           {shift.date}
                         </StyledTableCell>
@@ -151,8 +151,9 @@ export default function CollapsibleTable(props) {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {rows.map(row=>{
-            return <Row key={row.FullName} row={row}></Row>
+          {rows.map((row, index)=>{
+            return <Row row={row} key={index} ></Row>
+           
           })}
         </TableBody>
       </Table>

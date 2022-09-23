@@ -106,7 +106,7 @@ export const LoginComp = (props) => {
                 fontWeight: 700
             }}>LOGIN</Typography>
             <Box component={"div"} sx={{ m: 3, flexGrow: 1, justifyContent: 'center'}}>
-            <Grid container sx={{ justifyContent: 'center' }}>
+            <Grid container>
                 <Grid item>
                   <FormControlComp values={values} type="username" handleChange={handleChange}></FormControlComp> 
                 </Grid>

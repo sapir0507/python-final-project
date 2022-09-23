@@ -5,8 +5,8 @@ import UsersTableComp from './shared/usersTable'
 export const UsersComp = (props) => {
     return(
         
-        <Grid Container spacing={2}>
-            <Grid item sx={12}>
+        <Grid container spacing={2}>
+            <Grid item xs={12}>
                 <Typography align='center' variant='h2' component={'h1'} color={'black'} sx={{
                     flexGrow: 1,
                     m:4,
@@ -14,7 +14,7 @@ export const UsersComp = (props) => {
                     fontWeight: 700
                 }}>USERS</Typography>
             </Grid>
-            <Grid item sx={12}>
+            <Grid item xs={12}>
                 <Container>
                     <UsersTableComp></UsersTableComp>
                 </Container>

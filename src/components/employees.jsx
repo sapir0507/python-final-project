@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
     'label + &': {
-      marginTop: theme.spacing(3),
+       marginTop: theme.spacing(3),
     },
     '& .MuiInputBase-input': {
       borderRadius: 4,
@@ -41,13 +41,13 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 export const EmployeesComp = (props) => {
     
     const navigate = useNavigate();
-    const [department_value, setDepartment_value] = useState(null);
     const [menueItems, setMenuItems] = useState([
         // {lable: 'None', value: <em>None</em>},
         {lable: 'Ten', value: 10},
         {lable: 'Twenty', value: 20},
         {lable: 'Thirty', value: 30}
     ]);
+    const [department_value, setDepartment_value] = useState(menueItems[0].value);
 
     const handleChange = (event) => {
         setDepartment_value(event.target.value);
@@ -64,32 +64,34 @@ export const EmployeesComp = (props) => {
             <Container sx={{marginTop: 4}}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>  
-                    <Button variant="outlined" onClick={()=>{navigate("/new-employee")}}>
+                    <Button variant="contained" color='info' size='large' onClick={()=>{navigate("/new-employee")}}>
                         New Employee
                     </Button>       
                 </Grid>
-                <Grid item xs={2}>
-                <Box sx={{ minWidth: 120 }}>
-                    <FormControl  variant="standard" fullWidth>
-                        <InputLabel id="department-select-label">Department</InputLabel>
-                        <Select
-                            labelId="department-select-label"
-                            id="demo-simple-select"
-                            value={department_value}
-                            placeholder={'department'}
-                            label="department"
-                            onChange={handleChange}
-                            input={<BootstrapInput/>}>
-                                {menueItems.map(item=>{
-                                    return <MenuItem value={item.value}>{item.lable}</MenuItem>
-                                })}
-                        </Select>
-                    </FormControl>
-                </Box>
+                <Grid item md={2}>
+                    <Box sx={{ minWidth: 120 }}>
+                        <FormControl  variant="standard" fullWidth>
+                            <InputLabel id="department-select-label">Department</InputLabel>
+                            <Select
+                                labelId="department-select-label"
+                                id="demo-simple-select"
+                                value={department_value}
+                                // placeholder={'department'}
+                                label="department"
+                                onChange={handleChange}
+                                input={<BootstrapInput/>}>
+                                    {menueItems.map(item=>{
+                                        return <MenuItem value={item.value} key={item.value}>{item.lable}</MenuItem>
+                                    })}
+                            </Select>
+                        </FormControl>
+                    </Box>
                 </Grid>
-                <Grid item xs={10} sx={{marginTop: 3}}>
-                    <CollapsibleTable>
-                    </CollapsibleTable>
+                <Grid item xs={10}>
+                    <Box sx={{marginTop: 3}}>
+                        <CollapsibleTable>
+                        </CollapsibleTable>
+                    </Box>
                 </Grid>
             </Grid>
         </Container>

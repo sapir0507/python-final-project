@@ -13,6 +13,7 @@ import EditDepartmentComp from "./components/editDepartment";
 import EditEmployee from "./components/editEmployee";
 import EmployeesComp from "./components/employees";
 import LoginComp from "./components/login";
+import NewDepartmentComp from "./components/newDepartment";
 import NewEmployee from "./components/newEmployee";
 import NavbarComp from "./components/shared/navbar";
 import ShiftComp from "./components/shifts";
@@ -30,7 +31,7 @@ function App() {
         <Route path='/employees' element={<EmployeesComp/>} />
         <Route path='/departments' element={<DepartmentComp/>} />
         <Route path='/new-employee' element={<NewEmployee/>} />
-        <Route path='/new-department' element={<DepartmentComp/>} />
+        <Route path='/new-department' element={<NewDepartmentComp/>} />
         <Route path='/edit-employee/:fullName' element={<EditEmployee/>} />
         <Route path='/edit-department/:department' element={<EditDepartmentComp/>} />
         <Route path='/shifts' element={<ShiftComp/>} />

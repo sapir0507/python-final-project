@@ -7,7 +7,6 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { createTheme, styled, tableCellClasses } from '@mui/material';
-
 import { ThemeProvider } from '@emotion/react';
 
 
@@ -98,8 +97,8 @@ export default function UsersTableComp(props) {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {rows.map(row=>{
-            return <Row key={row.FullName} row={row}></Row>
+          {rows.map((row, index)=>{
+            return <Row key={index} row={row}></Row>
           })}
         </TableBody>
       </Table>

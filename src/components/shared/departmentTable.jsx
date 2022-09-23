@@ -6,7 +6,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { Box, Collapse, Container, createTheme, IconButton, styled, tableCellClasses, Typography } from '@mui/material';
+import { Box, Collapse, Container, createTheme, IconButton, styled, tableCellClasses } from '@mui/material';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { ThemeProvider } from '@emotion/react';
 import { Link } from 'react-router-dom';
@@ -60,14 +60,12 @@ function Row (props) {
     <React.Fragment>
       <StyledTableRow sx={ { '& > *': { borderBottom: 'unset' } } }>
         <StyledTableCell component="th" scope="row" align='left' style={ { textTransform: "capitalize" } }>
-          <Link to={ `/edit-employee/${row.departmentName}` }>
+          <Link to={ `/edit-department/${row.departmentName}` }>
             { row.departmentName }
           </Link>
         </StyledTableCell>
         <StyledTableCell component="th" scope="row" align='left' style={ { textTransform: "capitalize" } }>
-          <Link to={ `/edit-department/${row.manger}` }>
-            { row.manger }
-          </Link>
+            { row.manger }  
         </StyledTableCell>
         <StyledTableCell align="right">
           <IconButton
@@ -84,10 +82,9 @@ function Row (props) {
       <StyledTableRow>
         <StyledTableCell></StyledTableCell>
         <StyledTableCell></StyledTableCell>
-        <StyledTableCell style={ { paddingBottom: 0, paddingTop: 0 } }>
+        <StyledTableCell style={ { paddingBottom: 4, paddingTop: 4 } }>
           <Collapse in={ open } timeout="auto" unmountOnExit>
             <Box sx={ { alignContent: 'center' } }>
-
               <Table size="small" aria-label="employees">
                 <TableHead>
                   <StyledTableRow>
@@ -95,13 +92,16 @@ function Row (props) {
                   </StyledTableRow>
                 </TableHead>
                 <TableBody>
-                  { row.employees.map((emp, index) => (
-                    <StyledTableRow key={ index } colSpan={ 3 }>
-                      <StyledTableCell component="th" scope="row" colSpan={ 1 } style={ { textTransform: "capitalize" } }>
-                        { emp.fullName }
+                  { row.employees.map((emp, index) => {
+                    console.log(emp, index)
+                    return <StyledTableRow key={ index } sx = {{ '& > *': { borderBottom: 'unset' }}}>
+                      <StyledTableCell component="th" scope="row" style={{ textTransform: "capitalize" }}>
+                      <Link to={ `/edit-employee/${emp}` }>
+                        { emp }
+                      </Link>
                       </StyledTableCell>
                     </StyledTableRow>
-                  )) }
+                  }) }
                 </TableBody>
               </Table>
             </Box>
