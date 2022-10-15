@@ -19,9 +19,25 @@ const get_all_employees = async () => {
     return resp
 }
 
+
+const get_employee = async (id) => { 
+    const _r = await axios.get("http://127.0.0.1:5000/employees", JSON.stringify({
+        "id": id
+    }))
+    console.log("_r", _r);
+    const _resp = await get_all_employees()
+    const resp = _resp.filter(emp=>emp._id.$oid===id)
+    return resp[0]
+}
+
 const add_employee = async (FirstName, LastName, StartWorkYear, DepartmentID)=>{
     setDefaults()
-    const employee = {FirstName: FirstName, LastName: LastName, StartWorkYear:StartWorkYear, DepartmentID:DepartmentID}
+    const employee = {
+        FirstName: FirstName, 
+        LastName: LastName, 
+        StartWorkYear: StartWorkYear, 
+        DepartmentID: DepartmentID
+    }
     const json_params = JSON.stringify({employee: employee})
     console.log("add department\n", json_params)
     await axios.post("http://127.0.0.1:5000/employees", json_params).then(resp=>{
@@ -32,9 +48,47 @@ const add_employee = async (FirstName, LastName, StartWorkYear, DepartmentID)=>{
     
 }
 
+const add_employee_to_shift = async (employeeId, shiftId)=>{
+    setDefaults()
+    const employee = {
+        employeeId: employeeId, 
+        shiftId: shiftId
+    }
+    const json_params = JSON.stringify({employee: employee})
+    console.log("add employee to shift\n", json_params)
+    await axios.post("http://127.0.0.1:5000/employees/add-to-shift", json_params).then(resp=>{
+       console.log(resp.status);
+    }).catch(err => {
+        console.log(err['response'].data['error'])
+    })
+    
+}
+
+const add_employee_to_department = async (employeeId, department_id)=>{
+    setDefaults()
+    const employee = {
+        employeeId: employeeId, 
+        department_id: department_id
+    }
+    const json_params = JSON.stringify({employee: employee})
+    console.log("add employee to department\n", json_params)
+    await axios.post("http://127.0.0.1:5000/employees/add-to-department", json_params).then(resp=>{
+       console.log(resp.status);
+    }).catch(err => {
+        console.log(err['response'].data['error'])
+    })
+    
+}
+
 const update_employee_params = async (employeeId, FirstName, LastName, StartWorkYear, DepartmentID)=>{
     setDefaults()
-    const employee = {id: employeeId, FirstName: FirstName, LastName: LastName, StartWorkYear:StartWorkYear, DepartmentID:DepartmentID}
+    const employee = {
+        id: employeeId, 
+        FirstName: FirstName, 
+        LastName: LastName, 
+        StartWorkYear:StartWorkYear, 
+        DepartmentID:DepartmentID
+    }
     const json_params = JSON.stringify({employee: employee})
     await axios.post("http://127.0.0.1:5000/employees", json_params).then(resp=>{
        console.log(resp.status);
@@ -45,7 +99,8 @@ const update_employee_params = async (employeeId, FirstName, LastName, StartWork
 }
 
 const update_employee = async (employeeId, employee)=>{
-    const Employee = { id: employeeId, 
+    const Employee = { 
+        id: employeeId, 
         LastName: employee['LastName'], 
         FirstName: employee['FirstName'],
         StartWorkYear: employee['StartWorkYear'],
@@ -66,7 +121,10 @@ const delete_employee = async (employeeId)=>{
 
 const employees_ws = {
     get_all_employees,
+    get_employee,
     add_employee,
+    add_employee_to_shift,
+    add_employee_to_department,
     delete_employee,
     update_employee,
     update_employee_params

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { createTheme, styled, tableCellClasses } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
+import users_ws from '../../services/users_service';
 
 
 
@@ -78,13 +79,27 @@ function Row(props) {
     }).isRequired,
   };
 
-const rows = [
-  createData('sapir shahar', 7, 7),
+// const rows = [
+//   createData('sapir shahar', 7, 7),
   
-];
+// ];
+
 
 export default function UsersTableComp(props) {
-    // const {rows} = props 
+   
+    const [rows, setRows] = useState([])
+    
+    useEffect(() => {
+      const getUsers = async() => {
+        const r = [...rows]
+        const all_users = await users_ws.get_all_users()
+        all_users.forEach(user => {
+          r.push(createData(user["FullName"], user["MaxActions"], user["CurrentActions"]))
+        });
+        setRows(r)
+      }
+      getUsers()
+    }, [])
   return (
     <ThemeProvider theme={darkTheme}>
       <TableContainer>

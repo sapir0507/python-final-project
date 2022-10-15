@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -10,6 +10,10 @@ import { Box, Collapse, Container, createTheme, IconButton, styled, tableCellCla
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { ThemeProvider } from '@emotion/react';
 import { Link } from 'react-router-dom';
+import departments_ws from '../../services/department_service';
+import employees_ws from '../../services/employees_service';
+import log_service from '../../services/log_service';
+import { useSelector } from 'react-redux';
 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -44,11 +48,12 @@ const darkTheme = createTheme({
   },
 });
 
-function createData (departmentName, manger, employees) {
+function createData (departmentName, manger, employees, departmentId) {
   return {
     departmentName,
     manger,
-    employees
+    employees,
+    departmentId
   };
 }
 
@@ -60,7 +65,7 @@ function Row (props) {
     <React.Fragment>
       <StyledTableRow sx={ { '& > *': { borderBottom: 'unset' } } }>
         <StyledTableCell component="th" scope="row" align='left' style={ { textTransform: "capitalize" } }>
-          <Link to={ `/edit-department/${row.departmentName}` }>
+          <Link to={ `/edit-department/${row.departmentId}` }>
             { row.departmentName }
           </Link>
         </StyledTableCell>
@@ -93,11 +98,10 @@ function Row (props) {
                 </TableHead>
                 <TableBody>
                   { row.employees.map((emp, index) => {
-                    console.log(emp, index)
                     return <StyledTableRow key={ index } sx = {{ '& > *': { borderBottom: 'unset' }}}>
                       <StyledTableCell component="th" scope="row" style={{ textTransform: "capitalize" }}>
-                      <Link to={ `/edit-employee/${emp}` }>
-                        { emp }
+                      <Link to={ `/edit-employee/${emp.id}` }>
+                        { emp.name }
                       </Link>
                       </StyledTableCell>
                     </StyledTableRow>
@@ -118,16 +122,54 @@ Row.propTypes = {
   row: PropTypes.shape({
     departmentName: PropTypes.string.isRequired,
     manger: PropTypes.string.isRequired,
+    departmentId: PropTypes.string.isRequired,
     employees: PropTypes.arrayOf(PropTypes.string).isRequired
   }).isRequired,
 };
 
-const rows = [
-  createData('mangament', 'sapir shahar', ["sapir shahar"]),
-];
 
 export default function DepartmentTableComp (props) {
-  // const {rows} = props 
+  const [rows, setRows] = useState()
+  useEffect(() => {
+
+    const setRowsFromService = async() => {
+      const _rows = {}
+      const temp_rows_array = []
+      let all_departments = await departments_ws.get_all_departments()
+      let all_employees = await employees_ws.get_all_employees()
+    
+      await all_departments.forEach(department => {
+         _rows[department["Name"]] = {}
+         _rows[department["Name"]]["department"] = {
+          departmentName: department.Name,
+          managerName: department.ManagerName,
+          departmentId: department._id.$oid
+         }
+         _rows[department["Name"]]["employees"] = []
+      });
+
+      all_employees.map((emp)=>{
+         const res = all_departments.filter(dep=>dep._id.$oid===emp.DepartmentID)
+         let _employees = _rows[res[0].Name].employees
+        _rows[res[0].Name] = {..._rows[res[0].Name],
+          //update employess that belong to this department
+          employees: [..._employees, {name: `${emp.FirstName} ${emp.LastName}`, id: emp._id.$oid}]
+        }
+        return emp
+      })
+     
+      Object.keys(_rows).forEach(key=>{
+        temp_rows_array.push(createData(_rows[key].department.departmentName, _rows[key].department.managerName,_rows[key].employees, _rows[key].department.departmentId))
+      })
+      
+      setRows(temp_rows_array)
+    }
+    setRowsFromService()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+
+  
   return (
     <Container>
       <ThemeProvider theme={ darkTheme }>
@@ -141,8 +183,8 @@ export default function DepartmentTableComp (props) {
               </StyledTableRow>
             </TableHead>
             <TableBody>
-              { rows.map(row => {
-                return <Row key={ row.departmentName } row={ row }></Row>
+              { rows && rows.map((row, index) => {
+                return <Row key={ index } row={ row }></Row>
               }) }
             </TableBody>
           </Table>

@@ -26,14 +26,16 @@ const get_user_by_FullName = async (FullName) => {
 }
 
 const get_user_by_username_and_password = async (username, password) => {
-    let usersFromDB = await get_all_users()
+    setDefaults()
     const user = {username: username, password: password}
-    const json_params = JSON.stringify({user: user})
-    await axios.post("http://127.0.0.1:5000/users", json_params).then(resp=>{
-       console.log(resp.status);
+    const json_params = JSON.stringify(user)
+    console.log(json_params)
+    const resp = await axios.post("http://127.0.0.1:5000/users", json_params).then(resp=>{
+       return resp.data.user
     }).catch(err => {
         console.log(err['response'].data['error'])
     })
+    return resp
 }
 
 
@@ -41,7 +43,8 @@ const get_user_by_username_and_password = async (username, password) => {
 
 const users_ws = {
     get_all_users,
-    get_user_by_FullName
+    get_user_by_FullName,
+    get_user_by_username_and_password
 }
 
 export default users_ws

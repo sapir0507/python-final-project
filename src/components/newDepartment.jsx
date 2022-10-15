@@ -1,14 +1,22 @@
-import { Box, Button, Container, Typography } from '@mui/material'
+import { Box, Button, Container, FormControl, FormGroup, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import departments_ws from '../services/department_service'
+import employees_ws from '../services/employees_service'
+import log_service from '../services/log_service'
 import TextFieldComp from './shared/textfield'
 
 export const NewDepartmentComp = (props) => {
     const navigate = useNavigate()
+    const session = useSelector(state=> state.session)
     const temp_values = {name: "", manager: ""}
     const [values, setValues] = useState(temp_values)
-
+    const [menuChoices2, setMenuChoices2] = useState([])
+    const [manager, setManager] = React.useState({
+        id: "", //employee id
+        value: "" //employee name
+    });
     const handleValue = (newValue) => { 
         console.log("handleValue");
         const _values = {...temp_values}
@@ -35,43 +43,40 @@ export const NewDepartmentComp = (props) => {
         type: "text", 
         error: false, 
         handleValue 
-    },
-    {
-        value: "",
-        label: "Manager", 
-        variant: "outlined", 
-        required: true, 
-        helperText: "please enter the full name of the department manager", 
-        disabled: false, 
-        type: "text", 
-        error: false, 
-        handleValue 
     }])
 
-    const handleError = (lable) => {
-        const temp = [...formTextFields].map(tf=>{
-            tf = {...tf,
-                error: tf.label === lable? true: false
-            }
-            return temp
-        })
-    }
+    // const handleError = (lable) => {
+    //     const temp = [...formTextFields].map(tf=>{
+    //         tf = {...tf,
+    //             error: tf.label === lable? true: false
+    //         }
+    //         return temp
+    //     })
+    // }
   
     const handleOnClick = () => {
-        if(values["name"]!==""&&values["manager"]!==""){
-            console.log("clicked");
-            departments_ws.add_department(values["name"], values["manager"])
+        if(values["name"]!=="" && manager && manager.id!==""){
+            //get id of manager
+            log_service.logEvent(session.session, `add new department`)
+            departments_ws.add_department(values["name"], manager.value, manager.id)
         }
     }
-
-    // useEffect(() => {
-    //   if(values["name"]!==""&&values["manager"]!==""){
-    //     console.log("use effect");
-    //     departments_ws.add_department(values["name"], values["manager"])
-    //   }
-    // }, [values])
     
-
+    useEffect(() => {
+      const getEmployees = async() => {
+        let employees = await employees_ws.get_all_employees()
+        employees = employees.map(employee=>{
+            return {
+                id: employee._id.$oid, //employee id
+                value: `${employee.FirstName} ${employee.LastName}` //employee name
+            }
+        })
+        console.log(employees);
+        setMenuChoices2(employees)
+    }
+      getEmployees()
+    }, [])
+    
 
     return(
         <div>
@@ -100,6 +105,25 @@ export const NewDepartmentComp = (props) => {
                             ></TextFieldComp>
                         </Container>
                     })}
+                     <Box sx={{ maxWidth: '42ch'}} display={'block'} m={'0 auto'}> 
+                                <FormGroup>  
+                                    <FormControl required sx={{my:2}} fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Manager Name</InputLabel>
+                                        <Select
+                                        // autoWidth
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={manager.id}
+                                        label="Manager Name"
+                                        onChange={(e)=>setManager({...manager, id: e.target.value})}
+                                        >
+                                        {menuChoices2 && menuChoices2.map((choice)=>{
+                                            return <MenuItem key={choice.id} value={choice.id}>{choice.value}</MenuItem>
+                                        })}
+                                        </Select>
+                                    </FormControl>
+                                </FormGroup>
+                                </Box>
                     <Box sx={{
                             margin: "0 auto",
                             display: "grid"
@@ -120,6 +144,7 @@ export const NewDepartmentComp = (props) => {
                            
                         }}
                         onClick={()=>{
+                            log_service.logEvent(session.session, `navigate back to departments, aka cancle`)
                             navigate('/departments')
                         }}
                         size='large' 

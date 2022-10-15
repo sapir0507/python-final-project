@@ -7,11 +7,11 @@ import auth from '../services/auth';
 // import users_ws from '../services/users_service';
 import { useDispatch } from 'react-redux';
 import { 
+    setActions,
     setToken, setUser, 
 } from '../redux/slices/sessionSlice'
 import users_ws from '../services/users_service';
-import TextFieldComp from './shared/textfield';
-import { grid } from '@mui/system';
+// import TextFieldComp from './shared/textfield';
 
 
 
@@ -81,12 +81,6 @@ export const LoginComp = (props) => {
         return resp
     }
 
-    // const getusers = async(username, password)=>{
-    //     let arr = await users_ws.get_all_users()
-    //     console.log(arr);
-    // }
-
-
 
     const hanleLoginAttempt = async (event) => {
         //attempt login
@@ -94,13 +88,23 @@ export const LoginComp = (props) => {
         auth_success? handleError(true) : handleError(false)
         if(auth_success){
            dispatch(setToken(sessionStorage["token"]))
+           const myAuthenticatedUser = await users_ws.get_user_by_username_and_password(values.username, values.password)
+           console.log(myAuthenticatedUser)
+           let arr = myAuthenticatedUser['FullName'].split(" ")
            dispatch(setUser({
             username: values.username,
             email: values.password,
-            FirstName: "",
-            LastName: "",
-            id: ""
+            FirstName: arr[0],
+            LastName: Array.isArray(arr.slice(1))? arr.slice(1).join(" "): arr.slice(1),
+            user_id: myAuthenticatedUser["WSID"],
+            _id: myAuthenticatedUser["_id"]
+
            }))
+           dispatch(setActions({
+            currentActions: myAuthenticatedUser["CurrentActions"],
+            maxActions: myAuthenticatedUser["MaxActions"]
+           }))
+
            navigate('/')
         }
         

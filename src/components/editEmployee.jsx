@@ -1,14 +1,25 @@
-import { Grid, Typography } from '@mui/material'
+import { Box, Button, Container, Divider, FormControl, FormControlLabel, FormGroup, Grid, InputLabel, MenuItem, Select, styled, Switch, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import shifts_ws from '../services/shifts_service'
 import employees_ws from '../services/employees_service'
+import AddIcon from '@mui/icons-material/Add';
+import log_service from '../services/log_service'
+import { useSelector } from 'react-redux'
 
+const Root = styled('div')(({ theme }) => ({
+    width: '100%',
+    ...theme.typography.body2,
+    '& > :not(style) + :not(style)': {
+      marginTop: theme.spacing(1),
+    },
+  }));
 
 export const EditEmployee = (props) => {
     const params = useParams()
     const navigate = useNavigate()
+    const session = useSelector(state=>state.session)
 
     const tempShift = {
         Date: "",
@@ -20,13 +31,20 @@ export const EditEmployee = (props) => {
         FirstName: "",
         LastName: "",
         StartWorkYear: "",
-        DepartmentID: ""
+        DepartmentID: "",
+        ShiftId: ""
     })
+
+    const [enabled, setEnabled] = useState(false)
 
     const [userShifts, setUserShifts] = useState([])
     const [allShifts, setAllShifts] = useState([])
-
-
+    const [shift, setShift] = React.useState({
+        id: "",
+        value: ""
+    });
+    const [menuChoices, setMenuChoices] = React.useState([]);
+  
     userData.PropTypes={
         FirstName: PropTypes.string.isRequired,
         LastName: PropTypes.string.isRequired,
@@ -50,16 +68,30 @@ export const EditEmployee = (props) => {
 
     useEffect(() => {
         const getAllShifts = async () => {
-            const shifts = await shifts_ws.get_all_shifts()   
-            console.log(shifts)
-        }
-        const getEmployee = async () => {
-            const employees = await employees_ws.get_all_employees()
-            const employee = employees.filter(emp=>(emp.FirstName+" "+emp.LastName)===params['FullName'])
-            console.log(employee)
+            const shifts = await shifts_ws.get_all_shifts()  
+            const shifts_tostring = shifts.map(s=>{
+                return {label: `${s.Date}, ${s.StartingHour}-${s.EndingHour}`, value: s._id.$oid}
+            })
+            setAllShifts(shifts)
+            setMenuChoices(shifts_tostring)
+
+            const employee = await employees_ws.get_employee(params["fullName"])
+            
+            console.log("employee", employee)
+            setUserData({...userData,
+                FirstName: employee.FirstName,
+                LastName: employee.LastName,
+                StartWorkYear: employee.StartWorkYear,
+                DepartmentID: employee.DepartmentID
+            })
         }
         getAllShifts()
     }, [])
+
+    useEffect(() => {
+      console.log("userdata", userData)
+    }, [userData])
+    
     
     
     return(
@@ -70,14 +102,107 @@ export const EditEmployee = (props) => {
                 textShadow: 'unset',
                 fontWeight: 700
             }}>EDIT EMPLOYEE</Typography>
-            <Grid container spacing={2}>
-                <Grid item>
+            <Container sx={{width: '100%'}}>
+            <Grid container spacing={2} sx={{m:1}} justifyContent={'space-around'} alignItems={'center'}>
+                <Grid item md={6}  justifyContent={'center'} alignItems={'center'} >
+                    <Container sx={{
+                        p:2,
+                        width:500,
+                        height: 700,
+                        border: "2px solid black",
+                        borderRadius: 2
+                    }}>
+                        {/* employee details */}
+                        <Box
+                            component="form"
+                            sx={{
+                                '& > :not(style)': { m: 1, minWidth: '25ch', maxWidth: '38ch' },
+                            }}
+                            noValidate
+                            autoComplete="off"
+                            >
+                                <Root>
+                                <Typography align='center' variant='h4' component={'h4'} autoCapitalize={true} color={'black'} sx={{
+                                    flexGrow: 1,
+                                    textShadow: 'unset',
+                                }}>employee details</Typography>
+                                  <Divider variant="fullWidth" component={'div'} role={'presentation'} sx={{margin: "0 auto"}}>
+                                   
+                                </Divider>
+                                </Root>
+                                <TextField id="First-Name" label="First Name" color='primary' variant="outlined" value={userData.FirstName} onChange={(e)=>setUserData({...userData, FirstName: e.target.value})}/>
+
+                                <TextField id="Last-Name" label="Last Name" color='primary' variant="outlined" value={userData.LastName} onChange={(e)=>{
+                                    const temp = {...userData, LastName: e.target.value}
+                                    setUserData(temp)
+                                }}/>
+
+                                <TextField id="start-work-year" color='primary' label="Start Work Year" variant="outlined" value={userData.StartWorkYear} onChange={(e)=>setUserData({...userData, StartWorkYear: e.target.value})}/>
+                                <FormGroup>
+                                    <FormControlLabel sx={{m:1}}
+                                        control={<Button variant='contained' onClick={()=>{
+                                            log_service.logEvent(session.session, `update employee`)
+                                        }} >Update</Button>}  />
+                                    <FormControlLabel sx={{m:1}}
+                                        control={<Button variant='contained' color="error"
+                                        onClick={()=>{
+                                            log_service.logEvent(session.session, `delete employee`)
+                                        }} >Delete</Button>}  />
+                                </FormGroup>
+                                <Root>
+                                <Typography align='center' variant='h4' component={'h4'} autoCapitalize={true} color={'black'} sx={{
+                                    flexGrow: 1,
+                                    textShadow: 'unset',
+                                }}>shifts</Typography>
+                                <Divider variant="fullWidth" component={'div'} role={'presentation'} sx={{margin: "0 auto"}}>
+                                   
+                                </Divider>
+                                </Root>
+
+                                
+
+                                <FormGroup>
+                                    <FormControlLabel control={<Switch defaultChecked={enabled} />} label="Enable" onClick={()=>setEnabled(!enabled)}/>
+                                    <Box sx={{ minWidth: '40ch' }}>
+                                    <FormControl disabled={!enabled} sx={{my:1, mx:6, minWidth: '25ch'}}>
+                                        <InputLabel id="demo-simple-select-label">Shift</InputLabel>
+                                        <Select
+                                        autoWidth
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={userData.ShiftId}
+                                        label="Shift"
+                                        onChange={(e)=>setUserData({...userData, ShiftId: e.target.value})}
+                                        >
+                                        {menuChoices.map((choice)=>{
+                                            return <MenuItem value={choice.value}>{choice.label}</MenuItem>
+                                            
+                                        })}
+                                        </Select>
+                                    </FormControl>
+                                    </Box>
+                                   
+                                    <FormControlLabel sx={{my:1, mx:6}} autoCapitalize
+                                        control={<Button variant='contained' sx={{p:1}} disabled={!enabled} startIcon={<AddIcon/>} onClick={()=>{
+                                            log_service.logEvent(session.session, `add employee to shift`)
+                                        }} >add employee to shift</Button>}  />
+                                </FormGroup>
+     
+                               
+                            </Box>
+                    </Container>
 
                 </Grid>
-                <Grid item>
-
+                <Grid item md={6}   justifyContent={'center'} alignItems={'center'} >
+                    <Container sx={{
+                        width:500,
+                        height: 700,
+                        border: "2px solid black",
+                        borderRadius: 2
+                    }}></Container>
                 </Grid>
             </Grid>
+            </Container>
         </div>
     )
 }

@@ -3,7 +3,8 @@ import { Box, Button, FormControl, Grid, InputBase, InputLabel, MenuItem, Select
 import { Container } from '@mui/system';
 import CollapsibleTable from './shared/table';
 import {useNavigate} from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import departments_ws from '../services/department_service';
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
     'label + &': {
@@ -48,9 +49,44 @@ export const EmployeesComp = (props) => {
         {lable: 'Thirty', value: 30}
     ]);
     const [department_value, setDepartment_value] = useState(menueItems[0].value);
+    const [department_name, setDepartment_name] = useState(null);
+
+    useEffect(() => {
+     const getAllDepartments = async() => {
+        const items = []
+        const item = {
+            lable: "Department Name",
+            value: 0
+        }
+        items.push(item)
+        const departments = await departments_ws.get_all_departments() 
+        departments.forEach((department) => {
+            console.log(department);
+            const item = {
+                lable: department["Name"],
+                value: department["Name"]
+            }
+            items.push(item)
+        });
+        console.log(items)
+        setMenuItems(items)
+        setDepartment_value(items[0].value)
+     }
+     getAllDepartments()
+    }, [])
+
+    useEffect(() => {
+        console.log(department_value)    
+    }, [department_value])
+    
 
     const handleChange = (event) => {
         setDepartment_value(event.target.value);
+        if(Number(event.target.value)===0){
+            setDepartment_name(null)
+        }
+        else
+            setDepartment_name(event.target.value)
     };
 
     return(
@@ -63,7 +99,7 @@ export const EmployeesComp = (props) => {
                 }}>EMPLOYEES</Typography>
             <Container sx={{marginTop: 4}}>
             <Grid container spacing={2}>
-                <Grid item md={2} xs={7}>
+                <Grid item md={3} xs={7}>
                     <Box sx={{ minWidth: 120 }}>
                         <FormControl  variant="standard" fullWidth>
                             <InputLabel id="department-select-label">Department</InputLabel>
@@ -71,7 +107,6 @@ export const EmployeesComp = (props) => {
                                 labelId="department-select-label"
                                 id="demo-simple-select"
                                 value={department_value}
-                                // placeholder={'department'}
                                 label="department"
                                 onChange={handleChange}
                                 input={<BootstrapInput/>}>
@@ -91,7 +126,7 @@ export const EmployeesComp = (props) => {
                 </Grid>
                 <Grid item xs={12}>
                     <Box sx={{marginTop: 3}}>
-                        <CollapsibleTable>
+                        <CollapsibleTable department_name = {department_name}>
                         </CollapsibleTable>
                     </Box>
                 </Grid>

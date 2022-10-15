@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setToken } from '../../redux/slices/sessionSlice';
 import { createTheme } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
+import log_service from '../../services/log_service';
 
 const darkTheme = createTheme({
   palette: {
@@ -28,8 +29,8 @@ const darkTheme = createTheme({
   },
 });
 
-const pages = [ 'employees','departments', 'shifts', 'users', 'login'];
-const settings = ['dashboard', 'employees','departments', 'shifts', 'users', 'logout'];
+// const pages = [ 'employees','departments', 'shifts', 'users', 'login'];
+// const settings = ['dashboard', 'employees','departments', 'shifts', 'users', 'logout'];
 
 const NavbarComp = () => {
   const navigate = useNavigate()
@@ -38,13 +39,19 @@ const NavbarComp = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [loggedin, setLoggedin] = React.useState(false);
+  const [fullname, setFullname] = React.useState("");
+  const [settings, setSettings] = React.useState(['dashboard', 'employees','departments', 'shifts', 'users', 'logout'])
+
+  const [pages, setPages] = React.useState(['employees','departments', 'shifts', 'users', 'login'])
 
   useEffect(() => {
-    console.log(session.session["token"]);
-    if(session.session["token"]!=="")
+    if(session.session["token"]!==""){
+      setFullname(`${session.session['user']['FirstName']} ${session.session['user']['LastName']}`)
       setLoggedin(true)
+    }
     else {
       setLoggedin(false)
+      setFullname("")
     }
   }, [session])
   
@@ -118,17 +125,20 @@ const NavbarComp = () => {
               }}
             >
               {pages.map((page) => {
-                if ((page!=='login') || (page === 'login' && !loggedin))
-                return <MenuItem 
-                style={{textTransform: 'capitalize'}}
-                key={page} 
-                onMouseDown={handleCloseNavMenu}
-                onClick={()=>{
-                  navigate(page)
-                }}
-                >
-                <Typography textAlign="center">{page}</Typography>
-              </MenuItem> 
+                if ((page!=='login') || (page === 'login' && !loggedin)){
+                  const p = page
+                  return <MenuItem 
+                  style={{textTransform: 'capitalize'}}
+                  key={page} 
+                  onMouseDown={handleCloseNavMenu}
+                  onClick={()=>{
+                    log_service.logEvent(session.session, `navigate to ${p}`)
+                    navigate(p)
+                  }}
+                  >
+                  <Typography textAlign="center">{page}</Typography>
+                </MenuItem> 
+              }
               else return <span key={page}></span>
               
               
@@ -158,12 +168,13 @@ const NavbarComp = () => {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => {
+              const p = page
               if ((page!=='login') || (page === 'login' && !loggedin))
                 return <Button
                   style={{textTransform: 'capitalize'}}
                   key={page}
                   onClick={()=>{
-                    navigate(page)
+                    navigate(`/${page}`)
                   }}
                   onMouseDown={handleCloseNavMenu}
                   sx={{ my: 2, color: 'white', display: 'block' }}
@@ -174,7 +185,7 @@ const NavbarComp = () => {
             })}
           </Box>
           {loggedin? <Box sx={{ flexGrow: 0 }}> 
-                        username
+                        {fullname}
                       </Box>: 
                       <Box></Box>
           }
@@ -201,16 +212,21 @@ const NavbarComp = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onMouseDown={handleCloseUserMenu} style={{textTransform: 'capitalize'}} onClick={()=>{
-                  if(setting === "logout"){
-                    sessionStorage["token"] = ""
-                    dispatch(setToken(""))
-                    setLoggedin(false)
-                    navigate("/login")
-                  }
-                  else{
-                    navigate(`/${setting}`)
-                  }
+                <MenuItem 
+                  key={setting} 
+                  onMouseDown={handleCloseUserMenu} 
+                  style={{textTransform: 'capitalize'}} 
+                  onClick={()=>{
+                    if(setting === "logout"){
+                      sessionStorage["token"] = ""
+                      dispatch(setToken(""))
+                      setLoggedin(false)
+                      navigate("/login")
+                    }
+                    else{
+                      console.log(`/${setting}`);
+                      navigate(`/${setting}`)
+                    }
                 }}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>

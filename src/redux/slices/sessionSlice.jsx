@@ -9,6 +9,10 @@ const initialState = {
       FirstName: "",
       LastName: "",
       id: ""
+    },
+    actions:{
+      currentActions: 0,
+      maxActions: 0
     }
   },
 };
@@ -38,12 +42,20 @@ export const sessionSlice = createSlice({
         user: action.payload
       }} 
       return a
-    }  
+    },
+    setActions: (state, action)=>{
+      const session = state.session
+      const a = {...state, session: {
+      ...session,
+      actions: action.payload
+    }} 
+    return a
+  }    
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setToken, setUser } = sessionSlice.actions;
+export const { setToken, setUser, setActions } = sessionSlice.actions;
 
 export default sessionSlice.reducer;
 

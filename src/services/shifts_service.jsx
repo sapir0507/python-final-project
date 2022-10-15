@@ -19,6 +19,18 @@ const get_all_shifts = async () => {
     return resp
 }
 
+const get_shift = async (shiftID) => { 
+    let arr = []
+    setDefaults()
+    const resp = await axios.get(`http://127.0.0.1:5000/shifts/${shiftID}`).then(resp=>{
+        return resp.data.shift
+    }).catch(err => {
+        console.log(err['response'].data['error'])
+        return arr
+    })
+    return resp
+}
+
 const add_shift = async (Date, StartingHour, EndingHour)=>{
     setDefaults()
     const shift = {Date: Date, StartingHour: StartingHour, EndingHour:EndingHour}
@@ -45,12 +57,13 @@ const update_shift_params = async (shiftID, Date, StartingHour, EndingHour)=>{
 }
 
 const update_shift = async (shiftId, shifts)=>{
-    const Shift = { id: shiftId, 
+    const Shift = { 
+        id: shiftId, 
         Date: shifts['Date'], 
         StartingHour: shifts['StartingHour'],
         EndingHour: shifts['EndingHour'],
     }
-    await update_shift_params(Shift)
+    await update_shift(shiftId, Shift)
 }
 
 const delete_shift = async (shiftsId)=>{
@@ -65,6 +78,7 @@ const delete_shift = async (shiftsId)=>{
 
 const shifts_ws = {
     get_all_shifts,
+    get_shift,
     add_shift,
     delete_shift,
     update_shift,

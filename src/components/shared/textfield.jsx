@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 export const TextFieldComp = (props) => {
-    const {value, label, variant, required, helperText, disabled, type, error, handleValue } = props.tf
+    let {value, handleValue } = props.tf
     const [newValue, setNewValue] = useState(value? value: "")
 
     useEffect(() => {
@@ -15,21 +15,26 @@ export const TextFieldComp = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     , [newValue])
 
+    useEffect(()=>{
+        setNewValue(props.tf.value)
+    }, [props])
+
+
     return(
         <div>
             <TextField
                 id="outlined-required"
-                label={label? label: ""}
+                label={props.tf.label? props.tf.label: ""}
                 value={newValue}
-                variant={variant? variant: "outlined"}
+                variant={props.tf.variant? props.tf.variant: "outlined"}
                 onChange={(e)=>{
                     setNewValue(e.target.value)
                 }}
-                required={required? true: false}
-                helperText={helperText? helperText: ""}
-                disabled={disabled? true: false}
-                type={type? type: "text"}
-                error={error? true: false}
+                required={props.tf.required? true: false}
+                helperText={props.tf.helperText? props.tf.helperText: ""}
+                disabled={props.tf.disabled? true: false}
+                type={props.tf.type? props.tf.type: "text"}
+                error={props.tf.error? true: false}
             />
         </div>
     )
