@@ -20,9 +20,9 @@ const Root = styled('div')(({ theme }) => ({
     },
   }));
 
-export const EditDepartmentComp = (props) => {
+export const EditDepartmentComp = () => {
     const params = useParams()
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     const session = useSelector(state => state.session)
 
     const [departmentData, setDepartmentData] = useState({
@@ -46,6 +46,7 @@ export const EditDepartmentComp = (props) => {
     const [menuChoices1, setMenuChoices1] = React.useState([]);
     const [menuChoices2, setMenuChoices2] = React.useState([]);
 
+
   
     departmentData.PropTypes={
         ManagerName: PropTypes.string.isRequired,
@@ -53,42 +54,7 @@ export const EditDepartmentComp = (props) => {
         Name: PropTypes.string.isRequired,
         DepartmentId: PropTypes.string.isRequired
     }
-
-    useEffect(() => {
-        const getAllEmployees = async () => {
-            
-
-            const _employees = await employees_ws.get_all_employees()
-            const _departments = await departments_ws.get_all_departments()
-
-            const id = params["department"]
-
-            //get all the employees that aren't part of the department
-            const employees = (_employees.filter((emp)=> id===emp.DepartmentID)).map(emp=>{
-                return {
-                    ...emp,
-                    label: `${emp.FirstName} ${emp.LastName}` 
-                }
-            })
-            const all_emp = _employees.map(emp=>{
-                return {
-                    ...emp,
-                    label: `${emp.FirstName} ${emp.LastName}` 
-                }
-            })
-            // console.log("employess that don't belong to the department", employees)
-            
-            setAllEmployees(employees)
-            setMenuChoices1(all_emp) // for manager
-            setMenuChoices2(employees) // for adding employees to the department
-            const department = _departments.filter(d=>d._id.$oid===id)
-            setDepartmentData(department[0])            
-            setManager({id: department[0].Manager, value: department[0].ManagerName})
-            
-        }
-        getAllEmployees()
-    }, [params])
-
+    
     const handle_update_department = async() => { // works
         await departments_ws.update_department(params["department"], {
             Name: departmentData["Name"], // department name
@@ -104,7 +70,38 @@ export const EditDepartmentComp = (props) => {
     const handle_add_employee_to_department = async() => { //works
         await employees_ws.add_employee_to_department(employee.id, params["department"])
     }
-    
+
+    useEffect(() => {
+        const getAllEmployees = async () => {
+            const id = params["department"]
+            const _departments = await departments_ws.get_all_departments()
+            const department = _departments.filter(d=>d._id.$oid===id)
+
+            let employees = await employees_ws.get_all_employees()
+            employees = employees.map(emp=>{
+                return {
+                    ...emp,
+                    label: `${emp.FirstName} ${emp.LastName}` 
+                }
+            })
+            
+            setDepartmentData(department[0])            
+            //get all the employees that are part of this department
+            const department_employees = employees.filter(emp => id===emp.DepartmentID)
+            //get all the employees that aren't part of the department
+            const not_department_employees = employees.filter(emp => id!==emp.DepartmentID)
+            
+            setAllEmployees(department_employees)
+            setMenuChoices2(department_employees) // for manager
+            setMenuChoices1(not_department_employees) // for adding employees to the department
+
+        }
+
+        getAllEmployees()
+
+    }, [params])
+
+  
     return(
         <div>
             <Typography align='center' variant='h2' component={'h1'} color={'black'} sx={{
@@ -117,16 +114,11 @@ export const EditDepartmentComp = (props) => {
             <Grid container spacing={2} sx={{m:1}} justifyContent={'space-around'} alignItems={'center'}>
                 <Grid item md={6}  justifyContent={'center'} alignItems={'center'} >
                     <Container sx={{
-                        // p:2,
-                        // width:600,
-                        // height: 700,
-                    
+                       
                     }}>
                         {/* employee details */}
                         <Box
                             component="form"
-                            // justifyContent={'center'}
-
                             sx={{
                                 minWidth: '30ch',
                                 '& > :not(style)': { m: 1, minWidth: '25ch' },
@@ -176,6 +168,7 @@ export const EditDepartmentComp = (props) => {
                                 <Grid item xs= {5} sm= {5} md= {5}>
                                 <Box sx={{minWidth: '25ch'}}> 
                                 <FormGroup>  
+                                    {/* manager name, from all the employees that belong to the department */}
                                     <FormControl sx={{my:2}} fullWidth>
                                         <InputLabel id="demo-simple-select-label">New Manager Name</InputLabel>
                                         <Select
@@ -233,7 +226,7 @@ export const EditDepartmentComp = (props) => {
                                             />
                                     </Grid>
                                 </Grid>                                
-                               
+                               {/* department employees */}
                                 <Root>
                                 <Typography align='center' variant='h4' component={'h4'} autoCapitalize={true} color={'black'} sx={{
                                     flexGrow: 1,
@@ -243,7 +236,8 @@ export const EditDepartmentComp = (props) => {
                                    
                                 </Divider>
                                 </Root>
-                                <Grid container spacing={{ xs: 1, sm: 2, md: 2 }} justifyContent={'center'}>
+
+                                {menuChoices1.length!==0 && <Grid container spacing={{ xs: 1, sm: 2, md: 2 }} justifyContent={'center'}>
                                     <Grid item xs = {10} sm = {10} md = {10}>
                                     <FormGroup>
                                     <FormControlLabel onClick={()=>setEnabled(!enabled)} control={<Switch defaultChecked={enabled} />} label="Enable"/>
@@ -276,7 +270,16 @@ export const EditDepartmentComp = (props) => {
                                             handle_add_employee_to_department()
                                         }} >add to department</Button>}  />
                                     </Grid>
-                                </Grid>
+                                </Grid>}
+                                {menuChoices1.length === 0 &&  <Root>
+                                <Typography align='center' variant='h5' component={'h5'} autoCapitalize={false} color={'black'} sx={{
+                                    flexGrow: 1,
+                                    textShadow: 'unset',
+                                }}>It seems that all the employees belong to this department. No employees to add</Typography>
+                                <Divider variant="fullWidth" component={'div'} role={'presentation'} sx={{margin: "0 auto"}}>
+                                   
+                                </Divider>
+                                </Root>}
                                 
 
                                

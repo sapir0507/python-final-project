@@ -77,7 +77,10 @@ function Row (props) {
             aria-label="expand row"
             size="small"
             color='primary'
-            onClick={ () => setOpen(!open) }
+            onClick={ () => {
+              setOpen(!open) 
+            }
+            }
           >
             { open ? <KeyboardArrowUp /> : <KeyboardArrowDown /> }
           </IconButton>
@@ -97,7 +100,7 @@ function Row (props) {
                   </StyledTableRow>
                 </TableHead>
                 <TableBody>
-                  { row.employees.map((emp, index) => {
+                  { row.employees.length > 0 && row.employees.map((emp, index) => {
                     return <StyledTableRow key={ index } sx = {{ '& > *': { borderBottom: 'unset' }}}>
                       <StyledTableCell component="th" scope="row" style={{ textTransform: "capitalize" }}>
                       <Link to={ `/edit-employee/${emp.id}` }>
@@ -147,13 +150,14 @@ export default function DepartmentTableComp (props) {
          }
          _rows[department["Name"]]["employees"] = []
       });
-
       all_employees.map((emp)=>{
          const res = all_departments.filter(dep=>dep._id.$oid===emp.DepartmentID)
-         let _employees = _rows[res[0].Name].employees
-        _rows[res[0].Name] = {..._rows[res[0].Name],
-          //update employess that belong to this department
-          employees: [..._employees, {name: `${emp.FirstName} ${emp.LastName}`, id: emp._id.$oid}]
+         if(res.length>0){
+           let _employees = _rows[res[0].Name].employees
+           _rows[res[0].Name] = {..._rows[res[0].Name],
+            //update employess that belong to this department
+            employees: [..._employees, {name: `${emp.FirstName} ${emp.LastName}`, id: emp._id.$oid}]
+         }
         }
         return emp
       })
@@ -161,7 +165,6 @@ export default function DepartmentTableComp (props) {
       Object.keys(_rows).forEach(key=>{
         temp_rows_array.push(createData(_rows[key].department.departmentName, _rows[key].department.managerName,_rows[key].employees, _rows[key].department.departmentId))
       })
-      
       setRows(temp_rows_array)
     }
     setRowsFromService()

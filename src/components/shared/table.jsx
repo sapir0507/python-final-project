@@ -62,30 +62,27 @@ function Row(props) {
   
     useEffect(() => {
 
-      const _getShifts = async () => {
-          const k = {date: "", start: "", end: "", id: ""}
-          console.log(row.shifts);
-          const all_shifts = await shifts_ws.get_all_shifts()
+      const _getShifts = async (all_shifts) => {
+          const k = {date: "", start: "", end: "", id: ""} // when there's no shifts
           const all_shift_with_id = row.shifts.map((shiftID)=>{
-            console.log("shift id", shiftID)
-            const shift = all_shifts.filter(s=>{
-              console.log(s._id.$oid.toString(), shiftID.toString(), s._id.$oid.toString()===shiftID.toString());
-              return s._id.$oid.toString()===shiftID.toString()
-            })
-            console.log("shift", shift)
-            if(shift.length > 0){
-              k.date= shift[0].Date
-              k.start = shift[0].StartingHour
-              k.end = shift[0].EndingHour
-              k.id = shiftID
+            const shift = all_shifts.filter(s => s._id.$oid.toString()===shiftID.toString()) // works
+            if(shift.length > 0)
+            {
+              return {
+                date: shift[0].Date, 
+                start:  shift[0].StartingHour, 
+                end: shift[0].EndingHour, 
+                id: shiftID
+              } //works
             }
-            return k
+            else return k //works
           })
-          return all_shift_with_id
+          return all_shift_with_id // works
       }
 
       const getShifts = async () => {
-        const shifts = await _getShifts()
+        const all_shifts = await shifts_ws.get_all_shifts()
+        const shifts = await _getShifts(all_shifts)
         setTableShifts(shifts)
       }
       

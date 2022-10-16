@@ -1,4 +1,5 @@
 import axios from "axios"
+import employees_ws from "./employees_service"
 
 const setDefaults = () =>{
     axios.defaults.headers = { 
@@ -75,9 +76,16 @@ const delete_shift = async (shiftsId)=>{
     }) 
 }
 
+const get_employee_shifts = async(employeeId) => {
+    setDefaults()
+    const employee = await employees_ws.get_employee(employeeId)
+    return employee.shifts
+}
+
 
 const shifts_ws = {
     get_all_shifts,
+    get_employee_shifts,
     get_shift,
     add_shift,
     delete_shift,

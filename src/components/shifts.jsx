@@ -50,7 +50,6 @@ export const ShiftComp = (props) => {
         disabled: false,
         type: "text",
         error: false,
-        handleValue
     },
     {
         value: "",
@@ -61,7 +60,6 @@ export const ShiftComp = (props) => {
         disabled: false,
         type: "text",
         error: false,
-        handleValue
     },
     {
         value: "",
@@ -72,7 +70,6 @@ export const ShiftComp = (props) => {
         disabled: false,
         type: "text",
         error: false,
-        handleValue
     }])
 
     const [existingShiftsTextFields, SetExistingShiftsTextFields] = useState([])
@@ -211,6 +208,7 @@ export const ShiftComp = (props) => {
                             } }>
                                 <TextFieldComp
                                     tf={ tf }
+                                    handleValue={handleValue}
                                 ></TextFieldComp>
                             </Container>
                         }) }

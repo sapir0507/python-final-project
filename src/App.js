@@ -13,7 +13,7 @@ import {
 import DashboardComp from "./components/dashboard";
 import DepartmentComp from "./components/department";
 import EditDepartmentComp from "./components/editDepartment";
-import EditEmployee from "./components/editEmployee";
+import EditEmployee from "./components/editEmployee/editEmployee";
 import EmployeesComp from "./components/employees";
 import LoginComp from "./components/login";
 import NewDepartmentComp from "./components/newDepartment";

@@ -61,23 +61,17 @@ export const EmployeesComp = (props) => {
         items.push(item)
         const departments = await departments_ws.get_all_departments() 
         departments.forEach((department) => {
-            console.log(department);
             const item = {
                 lable: department["Name"],
                 value: department["Name"]
             }
             items.push(item)
         });
-        console.log(items)
         setMenuItems(items)
         setDepartment_value(items[0].value)
      }
      getAllDepartments()
     }, [])
-
-    useEffect(() => {
-        console.log(department_value)    
-    }, [department_value])
     
 
     const handleChange = (event) => {

@@ -3,20 +3,20 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 export const TextFieldComp = (props) => {
-    let {value, handleValue } = props.tf
-    const [newValue, setNewValue] = useState(value? value: "")
+    
+    const [newValue, setNewValue] = useState(props.tf.value? props.tf.value: "")
 
     useEffect(() => {
         const temp = {...props.tf,
             value: newValue
         }
-        handleValue(temp)
+        props.handleValue(temp)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     , [newValue])
 
     useEffect(()=>{
-        setNewValue(props.tf.value)
+        setNewValue(props.tf.value? props.tf.value: "")
     }, [props])
 
 
@@ -40,19 +40,6 @@ export const TextFieldComp = (props) => {
     )
 }
 
-TextFieldComp.propTypes = {
-    tf: PropTypes.shape({
-        value: PropTypes.string.isRequired, 
-        label:  PropTypes.string.isRequired, 
-        handleValue: PropTypes.func.isRequired,
-        helperText: PropTypes.string, 
-        variant:  PropTypes.string, 
-        required: PropTypes.bool, 
-        disabled: PropTypes.bool, 
-        type: PropTypes.string,
-        error: PropTypes.bool
-    }).isRequired
-}
 
 
 export default TextFieldComp

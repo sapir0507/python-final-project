@@ -18,19 +18,17 @@ export const NewDepartmentComp = (props) => {
         value: "" //employee name
     });
     const handleValue = (newValue) => { 
-        console.log("handleValue");
         const _values = {...temp_values}
         const temp = [...formTextFields].map(tf=>{
             if(tf.label===newValue.label)
                 tf.value = newValue.value
             return tf
         })
-        
-        _values["manager"] = temp[1].value
-        _values["name"] = temp[0].value
-        console.log(_values);
-        setValues(_values)
-        setFormTextFields(temp)
+        if(temp.length>0){
+            _values.name = temp[0].value
+            setValues(_values)
+            setFormTextFields(temp)
+        }
     }
 
     const [formTextFields, setFormTextFields] = useState([{
@@ -41,18 +39,8 @@ export const NewDepartmentComp = (props) => {
         helperText: "please enter the name of the department", 
         disabled: false, 
         type: "text", 
-        error: false, 
-        handleValue 
+        error: false 
     }])
-
-    // const handleError = (lable) => {
-    //     const temp = [...formTextFields].map(tf=>{
-    //         tf = {...tf,
-    //             error: tf.label === lable? true: false
-    //         }
-    //         return temp
-    //     })
-    // }
   
     const handleOnClick = () => {
         if(values["name"]!=="" && manager && manager.id!==""){
@@ -71,7 +59,6 @@ export const NewDepartmentComp = (props) => {
                 value: `${employee.FirstName} ${employee.LastName}` //employee name
             }
         })
-        console.log(employees);
         setMenuChoices2(employees)
     }
       getEmployees()
@@ -102,6 +89,7 @@ export const NewDepartmentComp = (props) => {
                              maxWidth: '45ch' }}}>
                             <TextFieldComp 
                                 tf={tf}
+                                handleValue={handleValue}
                             ></TextFieldComp>
                         </Container>
                     })}

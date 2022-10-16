@@ -1,12 +1,15 @@
 import { Box, Button, Container, Divider, FormControl, FormControlLabel, FormGroup, Grid, InputLabel, MenuItem, Select, styled, Switch, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import shifts_ws from '../services/shifts_service'
-import employees_ws from '../services/employees_service'
+import shifts_ws from '../../services/shifts_service'
+import employees_ws from '../../services/employees_service'
 import AddIcon from '@mui/icons-material/Add';
-import log_service from '../services/log_service'
+import log_service from '../../services/log_service'
 import { useSelector } from 'react-redux'
+import EditEmployeeShiftsTableComp from './employeeShifts'
+
+
 
 const Root = styled('div')(({ theme }) => ({
     width: '100%',
@@ -18,14 +21,9 @@ const Root = styled('div')(({ theme }) => ({
 
 export const EditEmployee = (props) => {
     const params = useParams()
-    const navigate = useNavigate()
     const session = useSelector(state=>state.session)
 
-    const tempShift = {
-        Date: "",
-        StartingHour: "",
-        EndingHour: ""
-    }
+    const [updateShifts, setUpdateShifts] = useState(false)
 
     const [userData, setUserData] = useState({
         FirstName: "",
@@ -88,11 +86,6 @@ export const EditEmployee = (props) => {
         getAllShifts()
     }, [])
 
-    useEffect(() => {
-      console.log("userdata", userData)
-    }, [userData])
-    
-    
     
     return(
         <div>
@@ -104,13 +97,12 @@ export const EditEmployee = (props) => {
             }}>EDIT EMPLOYEE</Typography>
             <Container sx={{width: '100%'}}>
             <Grid container spacing={2} sx={{m:1}} justifyContent={'space-around'} alignItems={'center'}>
-                <Grid item md={6}  justifyContent={'center'} alignItems={'center'} >
+                <Grid item md={5}  justifyContent={'center'} alignItems={'center'} >
                     <Container sx={{
-                        p:2,
+                     
                         width:500,
                         height: 700,
-                        border: "2px solid black",
-                        borderRadius: 2
+                       
                     }}>
                         {/* employee details */}
                         <Box
@@ -159,8 +151,6 @@ export const EditEmployee = (props) => {
                                 </Divider>
                                 </Root>
 
-                                
-
                                 <FormGroup>
                                     <FormControlLabel control={<Switch defaultChecked={enabled} />} label="Enable" onClick={()=>setEnabled(!enabled)}/>
                                     <Box sx={{ minWidth: '40ch' }}>
@@ -183,23 +173,25 @@ export const EditEmployee = (props) => {
                                     </Box>
                                    
                                     <FormControlLabel sx={{my:1, mx:6}} autoCapitalize
-                                        control={<Button variant='contained' sx={{p:1}} disabled={!enabled} startIcon={<AddIcon/>} onClick={()=>{
-                                            log_service.logEvent(session.session, `add employee to shift`)
+                                        control={<Button variant='contained' sx={{p:1}} disabled={!enabled} startIcon={<AddIcon/>} onClick={async()=>{
+                                            if(userData.ShiftId!==""){
+                                                await employees_ws.add_employee_to_shift(params["fullName"], userData.ShiftId)
+                                                log_service.logEvent(session.session, `add employee to shift`)
+                                                setUpdateShifts(!updateShifts)
+                                            }
                                         }} >add employee to shift</Button>}  />
                                 </FormGroup>
-     
-                               
+
                             </Box>
                     </Container>
 
                 </Grid>
-                <Grid item md={6}   justifyContent={'center'} alignItems={'center'} >
+                <Grid item md={7} xs={12} justifyContent={'center'} alignItems={'center'} >
                     <Container sx={{
-                        width:500,
-                        height: 700,
-                        border: "2px solid black",
-                        borderRadius: 2
-                    }}></Container>
+                        height: 700
+                    }}>
+                        <EditEmployeeShiftsTableComp employee_id={params["fullName"]} update_shifts={updateShifts}></EditEmployeeShiftsTableComp>
+                    </Container>
                 </Grid>
             </Grid>
             </Container>

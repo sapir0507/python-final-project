@@ -1,9 +1,8 @@
 import { Typography } from '@mui/material'
 import React from 'react'
-import { useSelector } from 'react-redux'
+import NewEmployeeForm from './newEmployee/newEmployee'
 
-export const NewEmployee = (props) => {
-    const session = useSelector(state=> state.session)
+export const NewEmployee = () => {
     return(
         <div>
             <Typography align='center' variant='h2' component={'h1'} color={'black'} sx={{
@@ -12,6 +11,7 @@ export const NewEmployee = (props) => {
                 textShadow: 'unset',
                 fontWeight: 700
             }}>NEW EMPLOYEE</Typography>
+            <NewEmployeeForm></NewEmployeeForm>
         </div>
     )
 }
