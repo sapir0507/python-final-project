@@ -6,8 +6,9 @@ import shifts_ws from '../../services/shifts_service'
 import employees_ws from '../../services/employees_service'
 import AddIcon from '@mui/icons-material/Add';
 import log_service from '../../services/log_service'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import EditEmployeeShiftsTableComp from './employeeShifts'
+import { setActions, setCurrentActions } from '../../redux/slices/sessionSlice'
 
 
 
@@ -22,7 +23,7 @@ const Root = styled('div')(({ theme }) => ({
 export const EditEmployee = (props) => {
     const params = useParams()
     const session = useSelector(state=>state.session)
-
+    const dispatch = useDispatch()
     const [updateShifts, setUpdateShifts] = useState(false)
 
     const [userData, setUserData] = useState({
@@ -63,6 +64,14 @@ export const EditEmployee = (props) => {
             EndingHour: PropTypes.string.isRequired
         })
     })
+
+    const handle_log = (message) => {
+        log_service.logEvent(session.session, message)
+        dispatch(setActions({
+            currentActions: session.session.actions.currentActions - 1,
+            maxActions: session.session.actions.maxActions
+        }))
+    }
 
     useEffect(() => {
         const getAllShifts = async () => {
@@ -133,12 +142,12 @@ export const EditEmployee = (props) => {
                                 <FormGroup>
                                     <FormControlLabel sx={{m:1}}
                                         control={<Button variant='contained' onClick={()=>{
-                                            log_service.logEvent(session.session, `update employee`)
+                                            handle_log('update employee')
                                         }} >Update</Button>}  />
                                     <FormControlLabel sx={{m:1}}
                                         control={<Button variant='contained' color="error"
                                         onClick={()=>{
-                                            log_service.logEvent(session.session, `delete employee`)
+                                            handle_log('delete employee')
                                         }} >Delete</Button>}  />
                                 </FormGroup>
                                 <Root>
@@ -176,7 +185,7 @@ export const EditEmployee = (props) => {
                                         control={<Button variant='contained' sx={{p:1}} disabled={!enabled} startIcon={<AddIcon/>} onClick={async()=>{
                                             if(userData.ShiftId!==""){
                                                 await employees_ws.add_employee_to_shift(params["fullName"], userData.ShiftId)
-                                                log_service.logEvent(session.session, `add employee to shift`)
+                                                handle_log('add employee to shift')
                                                 setUpdateShifts(!updateShifts)
                                             }
                                         }} >add employee to shift</Button>}  />

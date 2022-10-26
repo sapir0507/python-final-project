@@ -7,11 +7,14 @@ import TextFieldComp from './shared/textfield'
 import AddIcon from '@mui/icons-material/Add';
 import AutoModeIcon from '@mui/icons-material/AutoMode';
 import log_service from '../services/log_service'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { setActions } from '../redux/slices/sessionSlice'
 
 
 export const ShiftComp = (props) => {
     const session = useSelector(state => state.session)
+    const dispatch = useDispatch()
+
     const [enabled, setEnabled] = useState(false)
     const [updateShifts, setUpdateShifts] = useState(false)
 
@@ -26,6 +29,14 @@ export const ShiftComp = (props) => {
     const [allEmployees, setAllEmployees] = useState([])
     const [shift, setShift] = useState("")
     const [employee, setEmployee] = useState("")
+
+    const handle_log = (message) => {
+        log_service.logEvent(session.session, message)
+        dispatch(setActions({
+            currentActions: session.session.actions.currentActions - 1,
+            maxActions: session.session.actions.maxActions
+        }))
+    }
 
     const handleValue = (newValue) => {
         const temp = [...formTextFields].map(tf => {
@@ -161,7 +172,6 @@ export const ShiftComp = (props) => {
             })
             setAllShifts(shifts)  
         }
-        console.log("update shift")
         get_all_shifts()
 
     }, [updateShifts])
@@ -217,15 +227,15 @@ export const ShiftComp = (props) => {
                                 direction={ { xs: 'column', sm: 'column', md: 'row', lg: 'row' } }
                             >
                                 <Button variant='contained' size='larger' color='success' onClick={ () => {
-                                    log_service.logEvent(session.session, `create new shift`)
+                                    handle_log('create new shift')
                                     addShift()
                                     setUpdateShifts(!updateShifts)
                                 } } >
                                     Create New Shift
                                 </Button>
                                 <Button variant='contained' size='larger' color='secondary' onClick={ () => {
-                                    log_service.logEvent(session.session, `change existing shift`)
-                                     updateShift()
+                                    handle_log('change existing shift')
+                                    updateShift()
                                 } }>
                                     change existing shift
                                 </Button>
@@ -278,8 +288,7 @@ export const ShiftComp = (props) => {
                             <FormControlLabel sx={{ my: 1, mx: 6 }} autoCapitalize
                                 control={
                                     <Button variant='contained' sx={{ p: 1 }} disabled={ !enabled } startIcon={ <AddIcon /> } onClick={ () => {
-                                        log_service.logEvent(session.session, `add employee to shift`)
-
+                                        handle_log('add employee to shift')
                                         handleAddEmployeeToShift()
                                     } }>add to Shift</Button>
                                 }

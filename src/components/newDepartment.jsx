@@ -1,7 +1,8 @@
 import { Box, Button, Container, FormControl, FormGroup, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { setActions, setCurrentActions } from '../redux/slices/sessionSlice'
 import departments_ws from '../services/department_service'
 import employees_ws from '../services/employees_service'
 import log_service from '../services/log_service'
@@ -10,6 +11,7 @@ import TextFieldComp from './shared/textfield'
 export const NewDepartmentComp = (props) => {
     const navigate = useNavigate()
     const session = useSelector(state=> state.session)
+    const dispatch = useDispatch()
     const temp_values = {name: "", manager: ""}
     const [values, setValues] = useState(temp_values)
     const [menuChoices2, setMenuChoices2] = useState([])
@@ -31,6 +33,14 @@ export const NewDepartmentComp = (props) => {
         }
     }
 
+    const handle_log = (message) => {
+        log_service.logEvent(session.session, message)
+        dispatch(setActions({
+            currentActions: session.session.actions.currentActions - 1,
+            maxActions: session.session.actions.maxActions
+        }))
+    }
+
     const [formTextFields, setFormTextFields] = useState([{
         value: "",
         label: "Department Name", 
@@ -45,7 +55,7 @@ export const NewDepartmentComp = (props) => {
     const handleOnClick = () => {
         if(values["name"]!=="" && manager && manager.id!==""){
             //get id of manager
-            log_service.logEvent(session.session, `add new department`)
+            handle_log('add new department')
             departments_ws.add_department(values["name"], manager.value, manager.id)
         }
     }
@@ -132,7 +142,7 @@ export const NewDepartmentComp = (props) => {
                            
                         }}
                         onClick={()=>{
-                            log_service.logEvent(session.session, `navigate back to departments, aka cancle`)
+                            handle_log('navigate back to departments, aka cancle')
                             navigate('/departments')
                         }}
                         size='large' 

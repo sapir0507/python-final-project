@@ -9,7 +9,8 @@ import {UpdateRounded, Delete} from '@mui/icons-material';
 
 import departments_ws from '../services/department_service';
 import log_service from '../services/log_service';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setActions, setCurrentActions } from '../redux/slices/sessionSlice';
 
 
 const Root = styled('div')(({ theme }) => ({
@@ -24,7 +25,7 @@ export const EditDepartmentComp = () => {
     const params = useParams()
     // const navigate = useNavigate()
     const session = useSelector(state => state.session)
-
+    const dispatch = useDispatch()
     const [departmentData, setDepartmentData] = useState({
         Manager: "", //id
         ManagerName: "", //str
@@ -53,6 +54,16 @@ export const EditDepartmentComp = () => {
         Manager: PropTypes.string.isRequired,
         Name: PropTypes.string.isRequired,
         DepartmentId: PropTypes.string.isRequired
+    }
+
+    const handle_log = (message) => {
+        log_service.logEvent(session.session, message)
+        const curr = session.session.actions["currentActions"] - 1
+        console.log(curr)
+        dispatch(setActions({
+            currentActions: curr,
+            maxActions: session.session.actions.maxActions
+        }))
     }
     
     const handle_update_department = async() => { // works
@@ -208,7 +219,7 @@ export const EditDepartmentComp = () => {
                                                 startIcon={<Delete/>} 
                                                 color="error" 
                                                 onClick={()=>{
-                                                    log_service.logEvent(session.session, `delete department`)
+                                                    handle_log(`delete department`)
                                                     handle_delete_department()
                                                 }} >Delete Department</Button>}  
                                             />
@@ -219,7 +230,7 @@ export const EditDepartmentComp = () => {
                                                 startIcon={<UpdateRounded/>}
                                                 variant='contained' 
                                                 onClick={()=>{
-                                                    log_service.logEvent(session.session, `update department`)
+                                                    handle_log('update department')
                                                     handle_update_department()
                                                 }} 
                                                 >Update Department</Button>}  
@@ -266,7 +277,7 @@ export const EditDepartmentComp = () => {
                                     <Grid item xs = {10} sm = {10} md = {10} >
                                     <FormControlLabel sx={{m:1, mx: 6}} autoCapitalize
                                         control={<Button variant='contained' sx={{p:1}} disabled={!enabled} startIcon={<AddIcon/>} onClick={()=>{
-                                            log_service.logEvent(session.session, `add user to department`)
+                                            handle_log('add user to department')
                                             handle_add_employee_to_department()
                                         }} >add to department</Button>}  />
                                     </Grid>

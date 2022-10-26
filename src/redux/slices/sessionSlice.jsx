@@ -45,17 +45,35 @@ export const sessionSlice = createSlice({
     },
     setActions: (state, action)=>{
       const session = state.session
+      const actions = session.actions
       const a = {...state, session: {
       ...session,
-      actions: action.payload
+      actions: {...actions,
+        currentActions: action.payload.currentActions,
+        maxActions: action.payload.maxActions
+      }
     }} 
     return a
   }    
   },
+  setCurrentActions: (state, action)=>{
+    const session = state.session
+    const actions = session.actions
+    const a = {...state, 
+      session: {
+        ...session,
+        actions: {
+          ...actions,
+          currentActions: action.payload,
+        }
+      }
+    }
+    return a
+  }     
 });
 
 // Action creators are generated for each case reducer function
-export const { setToken, setUser, setActions } = sessionSlice.actions;
+export const { setToken, setUser, setActions, setCurrentActions } = sessionSlice.actions;
 
 export default sessionSlice.reducer;
 

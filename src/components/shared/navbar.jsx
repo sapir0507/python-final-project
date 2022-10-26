@@ -40,8 +40,10 @@ const NavbarComp = () => {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [loggedin, setLoggedin] = React.useState(false);
   const [fullname, setFullname] = React.useState("");
+  // eslint-disable-next-line no-unused-vars
   const [settings, setSettings] = React.useState(['dashboard', 'employees','departments', 'shifts', 'users', 'logout'])
 
+  // eslint-disable-next-line no-unused-vars
   const [pages, setPages] = React.useState(['employees','departments', 'shifts', 'users', 'login'])
 
   useEffect(() => {
@@ -70,6 +72,13 @@ const NavbarComp = () => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  const handleNavigate = (location) => {
+    navigate(`/${location}`)
+  }
+  // const handle_log = () => {
+    
+  // }
 
   return (
    <ThemeProvider theme={darkTheme}>
@@ -133,7 +142,8 @@ const NavbarComp = () => {
                   onMouseDown={handleCloseNavMenu}
                   onClick={()=>{
                     log_service.logEvent(session.session, `navigate to ${p}`)
-                    navigate(p)
+                    handleNavigate(p)
+                    // navigate(p)
                   }}
                   >
                   <Typography textAlign="center">{page}</Typography>
@@ -161,7 +171,8 @@ const NavbarComp = () => {
             }}
             onClick={(e)=>{
               e.preventDefault()
-              navigate('/dashboard')
+              handleNavigate("dashboard")
+              // navigate('/dashboard')
             }}
           >
             LOGO
@@ -174,7 +185,8 @@ const NavbarComp = () => {
                   style={{textTransform: 'capitalize'}}
                   key={page}
                   onClick={()=>{
-                    navigate(`/${page}`)
+                    handleNavigate(page)
+                    // navigate(`/${page}`)
                   }}
                   onMouseDown={handleCloseNavMenu}
                   sx={{ my: 2, color: 'white', display: 'block' }}
@@ -221,11 +233,13 @@ const NavbarComp = () => {
                       sessionStorage["token"] = ""
                       dispatch(setToken(""))
                       setLoggedin(false)
-                      navigate("/login")
+                      handleNavigate("login")
+                      // navigate("/login")
                     }
                     else{
-                      console.log(`/${setting}`);
-                      navigate(`/${setting}`)
+                      // console.log(`/${setting}`);
+                      handleNavigate(setting)
+                      // navigate(`/${setting}`)
                     }
                 }}>
                   <Typography textAlign="center">{setting}</Typography>

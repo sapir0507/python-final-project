@@ -12,9 +12,6 @@ import { ThemeProvider } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import departments_ws from '../../services/department_service';
 import employees_ws from '../../services/employees_service';
-import log_service from '../../services/log_service';
-import { useSelector } from 'react-redux';
-
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   textAlign: 'center',

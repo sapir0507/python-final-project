@@ -40,7 +40,7 @@ function App() {
       <NavbarComp></NavbarComp>
       <Outlet></Outlet>
       <Routes>
-        <Route path='/' element={<DashboardComp/>} />
+        <Route path='/' element={!loggedin? <Navigate to="/login"></Navigate>: <DashboardComp/>} />
         <Route path='/login' element={<LoginComp/>} />
         <Route path='/dashboard' 
           element={!loggedin? <Navigate to="/login"></Navigate>: <DashboardComp/>} />
